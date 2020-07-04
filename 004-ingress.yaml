@@ -1,0 +1,58 @@
+apiVersion: traefik.containo.us/v1alpha1
+kind: Middleware
+metadata:
+  name: service-strip
+  namespace: default
+spec:
+  stripPrefix:
+    prefixes:
+      - /service01
+      - /service02
+      - /service03
+      - /service04
+
+# IngresRoute
+---
+kind: IngressRoute
+apiVersion: traefik.containo.us/v1alpha1
+metadata:
+  name: service01
+  namespace: default
+
+spec:
+  entryPoints:
+    - web
+    - websecure
+  routes:
+  - match: Host(`speedup.local.com`) && PathPrefix(`/service01`)
+    kind: Rule
+    services:
+    - name: service01
+      port: 8080
+    middlewares:
+      - name: service-strip
+        namespace: default
+  - match: Host(`speedup.local.com`) && PathPrefix(`/service02`)
+    kind: Rule
+    services:
+    - name: service02
+      port: 8080
+    middlewares:
+      - name: service-strip
+        namespace: default
+  - match: Host(`speedup.local.com`) && PathPrefix(`/service03`)
+    kind: Rule
+    services:
+    - name: service03
+      port: 8080
+    middlewares:
+      - name: service-strip
+        namespace: default
+  - match: Host(`speedup.local.com`) && PathPrefix(`/service04`)
+    kind: Rule
+    services:
+    - name: service04
+      port: 8080
+    middlewares:
+      - name: service-strip
+        namespace: default
